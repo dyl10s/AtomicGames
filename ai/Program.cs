@@ -7,7 +7,7 @@ namespace ai
     {
         public int Select(string[] args)
         {
-            var port = 9090;
+            var port = 8098;
             if (args.Length > 0)
             {
                 int n;
