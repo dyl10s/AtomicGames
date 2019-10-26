@@ -45,13 +45,30 @@ namespace ai.unitStrategies
             var enemyLocations = map.EnemyLocationsInRange(unit.Location, 2);
             if (enemyLocations.Count > 0)
             {
+                (int x, int y) enemyToShoot = (0, 0);
+
+                if(enemyLocations.Count > 1)
+                {
+                    foreach (var loc in enemyLocations)
+                    {
+                        if (map.EnemyBaseLocation != loc)
+                        {
+                            enemyToShoot = loc;
+                        }
+                    }
+                }
+                else
+                {
+                    enemyToShoot = enemyLocations[0];
+                }
+
                 if (unit.CanAttack)
                 {
                     return new AICommand()
                     {
                         Command = AICommand.Shoot,
-                        Dx = enemyLocations[0].X - unit.Location.X,
-                        Dy = enemyLocations[0].Y - unit.Location.Y,
+                        Dx = enemyToShoot.x - unit.Location.X,
+                        Dy = enemyToShoot.y - unit.Location.Y,
                         Unit = unit.Id
                     };
                 }

@@ -72,6 +72,15 @@ namespace ai.unitStrategies
                 };
             }
 
+            if (Globals.um.ScoutCount < 3)
+            {
+                return new AICommand()
+                {
+                    Command = AICommand.Create,
+                    Type = "scout"
+                };
+            }
+
             if (Globals.um.WorkerCount < 8)
             {
                 return new AICommand()

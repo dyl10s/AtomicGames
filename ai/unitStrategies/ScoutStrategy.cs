@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 
@@ -22,41 +23,46 @@ namespace ai.unitStrategies
             command.Command = AICommand.Move;
             command.Unit = unit.Id;
 
+            var enemies = map.EnemyLocationsInRange(unit.Location, 100);
             
+            var closestEnemyLocation = (0, 0);
+            var closestEmenyDistance = -1;
 
-            if (map.EnemyBaseFound)
+            if (enemies.Count > 0)
             {
-                command.Dir = Explore(map, unit);
-            }
-            else if (map.HasResources)
-            {
-                command.Dir = GetDirectionToGem(map, unit);
-                if (command.Dir == "None")
+                var enemiesAttack = map.EnemyLocationsInRange(unit.Location, 1);
+
+                if (enemiesAttack.Count > 0)
                 {
+                    if (unit.CanAttack)
+                    {
+                        return new AICommand()
+                        {
+                            Command = AICommand.Melee,
+                            Target = map[(enemiesAttack[0].X, enemiesAttack[0].Y)].TileUpdate.Units[0].Id,
+                            Unit = unit.Id
+                        };
+                    }
+                }
+               
+                foreach (var e in enemies)
+                {
+                    var enemyDist = map.CalculateEstimatedDistance(unit.Location, e);
 
-                    command.Dir = Explore(map, unit);
-
-
-                    //command.Command = AICommand.Gather;
-                    //command.Dir = AICommand.SerializeDirection(map.DirectionToAdjacentResource(unit.Location));
+                    if (closestEmenyDistance == -1)
+                    {
+                        closestEnemyLocation = e;
+                        closestEmenyDistance = enemyDist;
+                    }
+                    else if(enemyDist < closestEmenyDistance)
+                    {
+                        closestEmenyDistance = enemyDist;
+                        closestEnemyLocation = e;
+                    }
                 }
 
-                else
-                {
-                    command.Dir = Explore(map, unit);
-                }
-            }
-           
-            else if (map.EnemyBaseFound)
-            {
-                command.Dir = Explore(map, unit);
-                if (command.Dir == "None")
-                {
-                    command.Command = AICommand.Gather;
-                    command.Dir = AICommand.SerializeDirection(map.DirectionToAdjacentResource(unit.Location));
-                }
-
-                if (command.Dir == "no path")
+                command.Dir = MoveToPoint(map, unit, closestEnemyLocation);
+                if(command.Dir == "None")
                 {
                     command.Dir = Explore(map, unit);
                 }
@@ -70,7 +76,19 @@ namespace ai.unitStrategies
             return command;
         }
 
-      
+        public static string MoveToPoint(IMap map, Unit unit, (int x, int y) point)
+        {
+            PathFinder finder = new PathFinder(map);
+            var steps = finder.FindPath(unit.Location, point, 0);
+            if (steps != null && steps.Count > 0)
+            {
+                return Globals.directionToAdjactentPoint(unit.Location, steps[0]);
+            }
+            else
+            {
+                return "None";
+            }
+        }
 
         public static string Explore(IMap map, Unit unit)
         {
@@ -86,26 +104,111 @@ namespace ai.unitStrategies
             if (results == null)
             {
                 var rnd = new Random();
+
                 if (navDirection[unit.Id] == "N" || navDirection[unit.Id] == "S")
                 {
                     if (rnd.Next(0, 8) == 0)
                     {
-                        navDirection[unit.Id] = "W";
+                        if(!map[(unit.Location.X - 1, unit.Location.Y)].TileUpdate.Blocked)
+                        {
+                            navDirection[unit.Id] = "W";
+                        }
+                        else
+                        {
+                            if (!map[(unit.Location.X + 1, unit.Location.Y)].TileUpdate.Blocked)
+                            {
+                                navDirection[unit.Id] = "E";
+                            }
+                            else
+                            {
+                                if(navDirection[unit.Id] == "N")
+                                {
+                                    navDirection[unit.Id] = "S";
+                                }
+                                else
+                                {
+                                    navDirection[unit.Id] = "N";
+                                }
+                            }
+                        }
                     }
                     else
                     {
-                        navDirection[unit.Id] = "E";
+                        if (!map[(unit.Location.X + 1, unit.Location.Y)].TileUpdate.Blocked)
+                        {
+                            navDirection[unit.Id] = "E";
+                        }
+                        else
+                        {
+                            if (!map[(unit.Location.X - 1, unit.Location.Y)].TileUpdate.Blocked)
+                            {
+                                navDirection[unit.Id] = "W";
+                            }
+                            else
+                            {
+                                if (navDirection[unit.Id] == "N")
+                                {
+                                    navDirection[unit.Id] = "S";
+                                }
+                                else
+                                {
+                                    navDirection[unit.Id] = "N";
+                                }
+                            }
+                        }
                     }
                 }
                 else if (navDirection[unit.Id] == "E" || navDirection[unit.Id] == "W")
                 {
                     if (rnd.Next(0, 8) == 0)
                     {
-                        navDirection[unit.Id] = "N";
+                        if (!map[(unit.Location.X, unit.Location.Y - 1)].TileUpdate.Blocked)
+                        {
+                            navDirection[unit.Id] = "N";
+                        }
+                        else
+                        {
+                            if (!map[(unit.Location.X, unit.Location.Y + 1)].TileUpdate.Blocked)
+                            {
+                                navDirection[unit.Id] = "S";
+                            }
+                            else
+                            {
+                                if (navDirection[unit.Id] == "E")
+                                {
+                                    navDirection[unit.Id] = "W";
+                                }
+                                else
+                                {
+                                    navDirection[unit.Id] = "E";
+                                }
+                            }
+                        }
                     }
                     else
                     {
-                        navDirection[unit.Id] = "S";
+                        if (!map[(unit.Location.X, unit.Location.Y + 1)].TileUpdate.Blocked)
+                        {
+                            navDirection[unit.Id] = "S";
+                        }
+                        else
+                        {
+                            if (!map[(unit.Location.X, unit.Location.Y - 1)].TileUpdate.Blocked)
+                            {
+                                navDirection[unit.Id] = "N";
+                            }
+                            else
+                            {
+                                if (navDirection[unit.Id] == "E")
+                                {
+                                    navDirection[unit.Id] = "W";
+                                }
+                                else
+                                {
+                                    navDirection[unit.Id] = "E";
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -167,25 +270,25 @@ namespace ai.unitStrategies
         {
             if (dir == "N")
             {
-                start.x -= 1;
+                start.y -= 1;
                 return start;
             }
 
             if (dir == "S")
             {
-                start.x += 1;
+                start.y += 1;
                 return start;
             }
 
             if (dir == "E")
             {
-                start.y += 1;
+                start.x += 1;
                 return start;
             }
 
             if (dir == "W")
             {
-                start.y -= 1;
+                start.x -= 1;
                 return start;
             }
 
