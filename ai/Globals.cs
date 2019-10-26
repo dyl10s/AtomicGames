@@ -6,10 +6,15 @@ namespace ai
 {
     class Globals
     {
+
+        public static List<(int x, int y)> hasResources = new List<(int x, int y)>();
+
+
         public static string North = "N";
         public static string South = "S";
         public static string East = "E";
         public static string West = "W";
+      
 
 
         public static string directionToAdjactentPoint((int x, int y)cur, (int x, int y) dest)

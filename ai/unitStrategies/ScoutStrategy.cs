@@ -6,22 +6,47 @@ using System.Text;
 namespace ai.unitStrategies
 {
     public class ScoutStrategy
-    {
+    { 
+       
+        public static List<(int x, int y)> hasResources = new List<(int x, int y)>();
 
         public static Dictionary<int, string> navDirection = new Dictionary<int, string>();
+
+        public static List<(int unit, string unitId)> trackScountUnit = new List<(int unit, string unitId)>();
 
         public static AICommand GetStrategy(IMap map, Unit unit)
         {
 
+            var rand = new Random();
             var command = new AICommand();
             command.Command = AICommand.Move;
             command.Unit = unit.Id;
 
+            
 
-            if (map.EnemyBaseFound == true)
+            if (map.EnemyBaseFound)
             {
                 command.Dir = Explore(map, unit);
             }
+            else if (map.HasResources)
+            {
+                command.Dir = GetDirectionToGem(map, unit);
+                if (command.Dir == "None")
+                {
+
+                    command.Dir = Explore(map, unit);
+
+
+                    //command.Command = AICommand.Gather;
+                    //command.Dir = AICommand.SerializeDirection(map.DirectionToAdjacentResource(unit.Location));
+                }
+
+                else
+                {
+                    command.Dir = Explore(map, unit);
+                }
+            }
+           
             else if (map.EnemyBaseFound)
             {
                 command.Dir = Explore(map, unit);
@@ -45,7 +70,7 @@ namespace ai.unitStrategies
             return command;
         }
 
-        
+      
 
         public static string Explore(IMap map, Unit unit)
         {
@@ -63,18 +88,18 @@ namespace ai.unitStrategies
                 var rnd = new Random();
                 if (navDirection[unit.Id] == "N" || navDirection[unit.Id] == "S")
                 {
-                    if (rnd.Next(0, 2) == 0)
+                    if (rnd.Next(0, 8) == 0)
                     {
-                        navDirection[unit.Id] = "E";
+                        navDirection[unit.Id] = "W";
                     }
                     else
                     {
-                        navDirection[unit.Id] = "W";
+                        navDirection[unit.Id] = "E";
                     }
                 }
                 else if (navDirection[unit.Id] == "E" || navDirection[unit.Id] == "W")
                 {
-                    if (rnd.Next(0, 2) == 0)
+                    if (rnd.Next(0, 8) == 0)
                     {
                         navDirection[unit.Id] = "N";
                     }
@@ -91,6 +116,52 @@ namespace ai.unitStrategies
 
             return "None";
         }
+
+
+        public static string GetDirectionToGem(IMap map, Unit unit)
+        {
+            PathFinder finder = new PathFinder(map);
+
+            if (map.HasResources)
+            {
+                var closeList = map.ResourceLocationsNearest(unit.Location);
+                (int x, int y) closePoint = (0, 0);
+                int lowestDistance = -1;
+
+                foreach (var x in closeList)
+                {
+                    var dist = map.CalculateEstimatedDistance(x, unit.Location);
+                    if (lowestDistance == -1)
+                    {
+                        lowestDistance = dist;
+                        closePoint = x;
+                    }
+                    else if (dist < lowestDistance)
+                    {
+                        lowestDistance = dist;
+                        closePoint = x;
+                    }
+                }
+
+                var steps = finder.FindPath(unit.Location, closePoint, 1);
+                if (steps == null)
+                {
+                    return "no path";
+                }
+
+                if (steps.Count > 0)
+                {
+                    return Globals.directionToAdjactentPoint(unit.Location, steps[0]);
+                }
+                else
+                {
+                    return "None";
+                }
+            }
+
+            return "None";
+        }
+
 
         public static (int x, int y) GetPointFromDir((int x, int y) start, string dir)
         {
