@@ -17,6 +17,21 @@ namespace ai
 
         public AICommand BuildCommand(Unit unit)
         {
+            if (unit.IsScout)
+            {
+
+            }
+
+            if (unit.IsWorker)
+            {
+
+            }
+
+            if (unit.IsTank)
+            {
+
+            }
+
             var direction = AICommand.SerializeDirection(MapDirections.RandomDirection());
             return new AICommand { Command = AICommand.Move, Unit = unit.Id, Dir = direction };
         }
