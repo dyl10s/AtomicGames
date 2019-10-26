@@ -18,30 +18,35 @@ namespace ai
 
         public AICommand BuildCommand(Unit unit)
         {
-
+            var direction = AICommand.SerializeDirection(MapDirections.RandomDirection());
+            var returnAction = new AICommand { Command = direction, Unit = unit.Id, Dir = direction };
 
             if (unit.IsScout)
             {
-                return ScoutStrategy.GetStrategy(Map, unit);
+                returnAction = ScoutStrategy.GetStrategy(Map, unit);
             }
 
             if (unit.IsWorker)
             {
-                return WorkerStrategy.GetStrategy(Map, unit);
+                returnAction = WorkerStrategy.GetStrategy(Map, unit);
             }
 
             if (unit.IsTank)
             {
-                return TankStrategy.GetStrategy(Map, unit);
+                returnAction = TankStrategy.GetStrategy(Map, unit);
             }
 
             if (unit.IsBase)
             {
-                return BaseStrategy.GetStrategy(Map, unit);
+                returnAction = BaseStrategy.GetStrategy(Map, unit);
             }
 
-            var direction = AICommand.SerializeDirection(MapDirections.RandomDirection());
-            return new AICommand { Command = direction, Unit = unit.Id, Dir = direction };
+            if(returnAction.Dir == "None")
+            {
+                return null;
+            }
+
+            return returnAction;
         }
     }
 }

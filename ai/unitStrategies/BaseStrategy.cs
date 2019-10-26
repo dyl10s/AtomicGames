@@ -13,7 +13,7 @@ namespace ai.unitStrategies
             if (unit.IsIdle)
             {
                 startupCommand++;
-                return StartupFunctions();
+                return StartupFunctions(map, unit);
             }
             else
             {
@@ -21,7 +21,7 @@ namespace ai.unitStrategies
             }
         }
 
-        public static AICommand StartupFunctions()
+        public static AICommand StartupFunctions(IMap map, Unit unit)
         {
             if (startupCommand == 0)
             {
@@ -31,8 +31,7 @@ namespace ai.unitStrategies
                     Type = "scout"
                 };
             }
-
-            if (startupCommand == 2)
+            else if (startupCommand == 2)
             {
                 return new AICommand()
                 {
@@ -40,8 +39,7 @@ namespace ai.unitStrategies
                     Type = "worker"
                 };
             }
-
-            if (startupCommand == 4)
+            else if (startupCommand == 4)
             {
                 return new AICommand()
                 {
@@ -49,8 +47,7 @@ namespace ai.unitStrategies
                     Type = "worker"
                 };
             }
-
-            if (startupCommand == 6)
+            else if (startupCommand == 6)
             {
                 return new AICommand()
                 {
@@ -58,26 +55,16 @@ namespace ai.unitStrategies
                     Type = "worker"
                 };
             }
-
-            if (startupCommand == 8)
+            else if (startupCommand == 8)
             {
                 return new AICommand()
                 {
                     Command = AICommand.Create,
-                    Type = "worker"
+                    Type = "tank"
                 };
             }
 
-            if (startupCommand == 10)
-            {
-                return new AICommand()
-                {
-                    Command = AICommand.Create,
-                    Type = "worker"
-                };
-            }
-
-            if (startupCommand == 12)
+            if(Globals.um.WorkerCount < 8)
             {
                 return new AICommand()
                 {

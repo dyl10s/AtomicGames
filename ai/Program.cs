@@ -24,10 +24,12 @@ namespace ai
     {
         public static void Main(string[] args)
         {
+            
             int port = new PortSelector().Select(args);
             var serverConnection = new ServerConnection(port, new MessageSerializer());
             var map = new Map();
-            var unitManager = new UnitManager(map, new UnitStrategyFactory());
+            Globals.um = new UnitManager(map, new UnitStrategyFactory());
+            var unitManager = Globals.um;
             var stateManager = new GameStateManager(unitManager, map);
             var gameStrategy = new AIStrategy(unitManager, map);
             var loop = new AILoop(serverConnection, stateManager, gameStrategy);

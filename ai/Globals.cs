@@ -11,6 +11,7 @@ namespace ai
         public static string East = "E";
         public static string West = "W";
 
+        public static UnitManager um;
 
         public static string directionToAdjactentPoint((int x, int y)cur, (int x, int y) dest)
         {

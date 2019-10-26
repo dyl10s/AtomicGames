@@ -7,7 +7,7 @@ namespace ai.unitStrategies
     public class TankStrategy
     {
         public static Dictionary<int, string> navDirection = new Dictionary<int, string>();
-        public static bool inDefenseMode = true;
+        public static bool inDefenseMode = false;
 
         public static AICommand GetStrategy(IMap map, Unit unit)
         {
@@ -20,16 +20,49 @@ namespace ai.unitStrategies
             {
                 command.Dir = Defend(map, unit);
 
-                if(command.Dir == "None"){ //Turret Mode
-
+                if(command.Dir == "base"){ //Turret Mode
+                    var turAction = Turret(map, unit);
+                    if (turAction.Command == AICommand.Shoot)
+                    {
+                        return turAction;
+                    }
+                    else
+                    {
+                        return null;
+                    }
                 }
             }
             else
             {
-                command.Dir = Explore(map, unit);
+                return Attack(map, unit);
             }
 
             return command;
+        }
+
+        public static AICommand Attack(IMap map, Unit unit)
+        {
+            var enemyLocations = map.EnemyLocationsInRange(unit.Location, 2);
+            if (enemyLocations.Count > 0)
+            {
+                if (unit.CanAttack)
+                {
+                    return new AICommand()
+                    {
+                        Command = AICommand.Shoot,
+                        Dx = enemyLocations[0].X - unit.Location.X,
+                        Dy = enemyLocations[0].Y - unit.Location.Y,
+                    };
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            else
+            {
+                return new AICommand() { Command = AICommand.Move, Dir = Explore(map, unit), Unit = unit.Id };
+            }
         }
 
         public static string Defend(IMap map, Unit unit)
@@ -39,7 +72,7 @@ namespace ai.unitStrategies
 
             if(path.Count == 0) //Already on base
             {
-                return "None";
+                return "base";
             }
             else
             {
@@ -47,17 +80,25 @@ namespace ai.unitStrategies
             }
         }
 
-        //public static AICommand Turret(IMap map, Unit unit)
-        //{
-        //    var atkCommand = new AICommand();
-        //    atkCommand.Command = AICommand.Shoot;
+        public static AICommand Turret(IMap map, Unit unit)
+        {
+            var atkCommand = new AICommand();
+            atkCommand.Command = AICommand.Shoot;
+            atkCommand.Unit = unit.Id;
 
-        //    var locations = map.EnemyLocationsInRange(unit.Location, 2);
-        //    if(locations.Count > 0)
-        //    {
+            var locations = map.EnemyLocationsInRange(unit.Location, 2);
+            if (locations.Count > 0)
+            {
+                atkCommand.Dx = locations[0].X - unit.Location.X;
+                atkCommand.Dy = locations[0].Y - unit.Location.Y;
+            }
+            else
+            {
+                atkCommand.Command = "";
+            }
 
-        //    }
-        //}
+            return atkCommand;
+        }
 
         public static string Explore(IMap map, Unit unit)
         {
