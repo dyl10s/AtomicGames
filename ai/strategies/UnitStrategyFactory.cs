@@ -14,11 +14,9 @@ namespace ai
 
         private IUnitStrategy BuildStrategy(IMap map, Unit unit, UnitManager unitManager)
         {
-            if (unit.IsMobile)
-            {
-                return BuildExploreStrategy(map, unit, unitManager);
-            }
-            return null;
+            
+            return BuildExploreStrategy(map, unit, unitManager);
+            
         }
 
         private ExploreStrategy BuildExploreStrategy(IMap map, Unit unit, UnitManager unitManager)
