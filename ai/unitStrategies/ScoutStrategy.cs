@@ -4,15 +4,12 @@ using System.Text;
 
 namespace ai.unitStrategies
 {
-    public class ScoutStrategy
+    class Scout
     {
-        public static AICommand GetStrategy(IMap map, Unit unit)
+        public AICommand GetStrategy(IMap map, Unit unit)
         {
             var command = new AICommand();
 
-            command.Command = AICommand.Move;  
-            command.Unit = unit.Id;
-            command.Dir = Globals.North;
 
             return command;
         }
