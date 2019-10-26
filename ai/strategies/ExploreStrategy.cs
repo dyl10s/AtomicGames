@@ -18,8 +18,6 @@ namespace ai
 
         public AICommand BuildCommand(Unit unit)
         {
-
-
             if (unit.IsScout)
             {
                 return ScoutStrategy.GetStrategy(Map, unit);
@@ -35,7 +33,8 @@ namespace ai
                 return TankStrategy.GetStrategy(Map, unit);
             }
 
-            return new AICommand {  };
+            var direction = AICommand.SerializeDirection(MapDirections.RandomDirection());
+            return new AICommand { Command = direction, Unit = unit.Id, Dir = direction };
         }
     }
 }
