@@ -18,6 +18,8 @@ namespace ai
 
         public AICommand BuildCommand(Unit unit)
         {
+
+
             if (unit.IsScout)
             {
                 return ScoutStrategy.GetStrategy(Map, unit);
