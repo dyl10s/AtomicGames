@@ -126,6 +126,8 @@ namespace ai
             get { return Tiles.Values.Any(t => t.HasEnemies); }
         }
 
+      
+
         public bool EnemyBaseFound
         {
             get { return Tiles.Values.Any(t => t.HasEnemyBase); }

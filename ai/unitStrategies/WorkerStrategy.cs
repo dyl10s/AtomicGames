@@ -13,6 +13,7 @@ namespace ai.unitStrategies
             var command = new AICommand();
             command.Command = AICommand.Move;
             command.Unit = unit.Id;
+
             
             if (unit.CarryingResource)
             {
@@ -36,6 +37,7 @@ namespace ai.unitStrategies
             {
                 command.Dir = Explore(map, unit);
             }
+
 
             return command;
         }
