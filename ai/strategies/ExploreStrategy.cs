@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using ai.unitStrategies;
 
 namespace ai
 {
@@ -17,23 +18,24 @@ namespace ai
 
         public AICommand BuildCommand(Unit unit)
         {
+
+
             if (unit.IsScout)
             {
-
+                return ScoutStrategy.GetStrategy(Map, unit);
             }
 
             if (unit.IsWorker)
             {
-
+                return WorkerStrategy.GetStrategy(Map, unit);
             }
 
             if (unit.IsTank)
             {
-
+                return TankStrategy.GetStrategy(Map, unit);
             }
 
-            var direction = AICommand.SerializeDirection(MapDirections.RandomDirection());
-            return new AICommand { Command = AICommand.Move, Unit = unit.Id, Dir = direction };
+            return new AICommand {  };
         }
     }
 }
