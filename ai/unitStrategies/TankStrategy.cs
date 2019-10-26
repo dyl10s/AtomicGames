@@ -19,6 +19,10 @@ namespace ai.unitStrategies
             if (inDefenseMode)
             {
                 command.Dir = Defend(map, unit);
+
+                if(command.Dir == "None"){ //Turret Mode
+
+                }
             }
             else
             {
@@ -42,6 +46,18 @@ namespace ai.unitStrategies
                 return Globals.directionToAdjactentPoint(unit.Location, path[0]);
             }
         }
+
+        //public static AICommand Turret(IMap map, Unit unit)
+        //{
+        //    var atkCommand = new AICommand();
+        //    atkCommand.Command = AICommand.Shoot;
+
+        //    var locations = map.EnemyLocationsInRange(unit.Location, 2);
+        //    if(locations.Count > 0)
+        //    {
+
+        //    }
+        //}
 
         public static string Explore(IMap map, Unit unit)
         {

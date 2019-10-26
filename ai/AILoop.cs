@@ -23,60 +23,8 @@ namespace ai
             while ((update = ServerConnection.ReadUpdate()) != null)
             {
                 StateManager.HandleGameUpdate(update);
-                if(startupCommand < 4)
-                {
-                    startupCommand++;
-                    var commands = AIStrategy.BuildCommandList();
-                    commands.Add(StartupFunctions());
-                    
-                    ServerConnection.SendCommands(commands);
-                }
-                else
-                {
-                    ServerConnection.SendCommands(AIStrategy.BuildCommandList());
-                }
+                ServerConnection.SendCommands(AIStrategy.BuildCommandList());
             }
-        }
-
-        public AICommand StartupFunctions()
-        {
-            if(startupCommand == 0)
-            {
-                return new AICommand()
-                {
-                    Command = AICommand.Create,
-                    Type = "scout"
-                };
-            }
-
-            if (startupCommand == 1)
-            {
-                return new AICommand()
-                {
-                    Command = AICommand.Create,
-                    Type = "scout"
-                };
-            }
-
-            if (startupCommand == 2)
-            {
-                return new AICommand()
-                {
-                    Command = AICommand.Create,
-                    Type = "tank"
-                };
-            }
-
-            if (startupCommand == 3)
-            {
-                return new AICommand()
-                {
-                    Command = AICommand.Create,
-                    Type = "tank"
-                };
-            }
-
-            return new AICommand();
         }
     }
 }

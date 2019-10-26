@@ -35,6 +35,11 @@ namespace ai
                 return TankStrategy.GetStrategy(Map, unit);
             }
 
+            if (unit.IsBase)
+            {
+                return BaseStrategy.GetStrategy(Map, unit);
+            }
+
             var direction = AICommand.SerializeDirection(MapDirections.RandomDirection());
             return new AICommand { Command = direction, Unit = unit.Id, Dir = direction };
         }
