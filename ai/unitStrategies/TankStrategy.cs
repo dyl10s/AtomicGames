@@ -7,6 +7,7 @@ namespace ai.unitStrategies
     public class TankStrategy
     {
         public static Dictionary<int, string> navDirection = new Dictionary<int, string>();
+        public static bool inDefenseMode = true;
 
         public static AICommand GetStrategy(IMap map, Unit unit)
         {
@@ -14,9 +15,32 @@ namespace ai.unitStrategies
 
             command.Command = AICommand.Move;
             command.Unit = unit.Id;
-            command.Dir = Explore(map, unit);
+
+            if (inDefenseMode)
+            {
+                command.Dir = Defend(map, unit);
+            }
+            else
+            {
+                command.Dir = Explore(map, unit);
+            }
 
             return command;
+        }
+
+        public static string Defend(IMap map, Unit unit)
+        {
+            PathFinder finder = new PathFinder(map);
+            var path = finder.FindPath(unit.Location, map.HomeBaseLocation);
+
+            if(path.Count == 0) //Already on base
+            {
+                return "None";
+            }
+            else
+            {
+                return Globals.directionToAdjactentPoint(unit.Location, path[0]);
+            }
         }
 
         public static string Explore(IMap map, Unit unit)

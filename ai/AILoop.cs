@@ -8,7 +8,7 @@ namespace ai
         private readonly IGameStateManager StateManager;
         private readonly IAIStrategy AIStrategy;
 
-        public static bool hasStarted = false;
+        public static int startupCommand = 0;
 
         public AILoop(IServerConnection serverConnection, IGameStateManager stateManager, IAIStrategy aiStrategy)
         {
@@ -23,14 +23,12 @@ namespace ai
             while ((update = ServerConnection.ReadUpdate()) != null)
             {
                 StateManager.HandleGameUpdate(update);
-                if(hasStarted == false)
+                if(startupCommand < 4)
                 {
-                    hasStarted = true;
+                    startupCommand++;
                     var commands = AIStrategy.BuildCommandList();
-                    foreach (var x in StartupFunctions())
-                    {
-                        commands.Add(x);
-                    }
+                    commands.Add(StartupFunctions());
+                    
                     ServerConnection.SendCommands(commands);
                 }
                 else
@@ -40,28 +38,45 @@ namespace ai
             }
         }
 
-        public List<AICommand> StartupFunctions()
+        public AICommand StartupFunctions()
         {
-            var commands = new List<AICommand>();
-            commands.Add(new AICommand()
+            if(startupCommand == 0)
             {
-                Command = AICommand.Create,
-                Type = "scout"
-            });
+                return new AICommand()
+                {
+                    Command = AICommand.Create,
+                    Type = "scout"
+                };
+            }
 
-            commands.Add(new AICommand()
+            if (startupCommand == 1)
             {
-                Command = AICommand.Create,
-                Type = "scout"
-            });
+                return new AICommand()
+                {
+                    Command = AICommand.Create,
+                    Type = "scout"
+                };
+            }
 
-            commands.Add(new AICommand()
+            if (startupCommand == 2)
             {
-                Command = AICommand.Create,
-                Type = "tank"
-            });
+                return new AICommand()
+                {
+                    Command = AICommand.Create,
+                    Type = "tank"
+                };
+            }
 
-            return commands;
+            if (startupCommand == 3)
+            {
+                return new AICommand()
+                {
+                    Command = AICommand.Create,
+                    Type = "tank"
+                };
+            }
+
+            return new AICommand();
         }
     }
 }
