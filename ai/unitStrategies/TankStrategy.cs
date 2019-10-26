@@ -52,6 +52,7 @@ namespace ai.unitStrategies
                         Command = AICommand.Shoot,
                         Dx = enemyLocations[0].X - unit.Location.X,
                         Dy = enemyLocations[0].Y - unit.Location.Y,
+                        Unit = unit.Id
                     };
                 }
                 else
@@ -61,7 +62,21 @@ namespace ai.unitStrategies
             }
             else
             {
-                return new AICommand() { Command = AICommand.Move, Dir = Explore(map, unit), Unit = unit.Id };
+                return new AICommand() { Command = AICommand.Move, Dir = MoveToEnemyBase(map, unit), Unit = unit.Id };
+            }
+        }
+
+        public static string MoveToEnemyBase(IMap map, Unit unit)
+        {
+            PathFinder finder = new PathFinder(map);
+            var steps = finder.FindPath(unit.Location, map.EnemyBaseLocation, 0);
+            if (steps.Count > 0)
+            {
+                return Globals.directionToAdjactentPoint(unit.Location, steps[0]);
+            }
+            else
+            {
+                return "None";
             }
         }
 

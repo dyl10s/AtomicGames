@@ -41,10 +41,14 @@ namespace ai
                 returnAction = BaseStrategy.GetStrategy(Map, unit);
             }
 
-            if(returnAction.Dir == "None")
+            if(returnAction != null)
             {
-                return null;
+                if (returnAction.Dir == "None")
+                {
+                    return null;
+                }
             }
+            
 
             return returnAction;
         }

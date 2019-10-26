@@ -60,17 +60,37 @@ namespace ai.unitStrategies
                 return new AICommand()
                 {
                     Command = AICommand.Create,
-                    Type = "tank"
+                    Type = "scout"
+                };
+            }
+            else if (startupCommand == 10)
+            {
+                return new AICommand()
+                {
+                    Command = AICommand.Create,
+                    Type = "scout"
                 };
             }
 
-            if(Globals.um.WorkerCount < 8)
+            if (Globals.um.WorkerCount < 8)
             {
                 return new AICommand()
                 {
                     Command = AICommand.Create,
                     Type = "worker"
                 };
+            }
+
+            if (map.EnemyBaseFound)
+            {
+                if(unit.ResourcesAvailable > 200)
+                {
+                    return new AICommand()
+                    {
+                        Command = AICommand.Create,
+                        Type = "tank"
+                    };
+                }
             }
 
             return new AICommand();
